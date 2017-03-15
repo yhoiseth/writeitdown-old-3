@@ -19,9 +19,6 @@ class DefaultControllerTest extends WebTestCase
         $this->bootKernel();
         $this->setContainer(static::$kernel->getContainer());
         $this->loadFixtures([]);
-//        dump(self::runCommand('app/console doctrine:database:drop --force'));
-//        self::runCommand('app/console doctrine:database:create');
-//        self::runCommand('app/console doctrine:schema:update --force');
     }
 
     public function testIndex()
