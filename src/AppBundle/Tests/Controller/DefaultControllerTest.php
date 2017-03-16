@@ -29,6 +29,12 @@ class DefaultControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/');
 
         $this->assertThatResponseIsOk($client);
+
+        $this->assertContains(
+            'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css',
+            $crawler->filter('head')->html()
+        );
+
         $this->assertContains('Welcome to Symfony', $crawler->filter('#container h1')->text());
     }
 
