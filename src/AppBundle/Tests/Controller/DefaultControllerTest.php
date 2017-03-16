@@ -34,7 +34,7 @@ class DefaultControllerTest extends WebTestCase
             $crawler->filter('head')->html()
         );
 
-        $this->assertContains('Welcome to Symfony', $crawler->filter('#container h1')->text());
+        $this->assertContains('Documents', $crawler->filter('#container h1')->text());
     }
 
     public function testLogin()
