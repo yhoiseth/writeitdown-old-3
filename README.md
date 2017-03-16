@@ -1,4 +1,4 @@
-writeitdown
-===========
+# Write it down
 
-A Symfony project created on March 15, 2017, 5:58 pm.
+## Running tests
+`bin/phpunit -c app`
