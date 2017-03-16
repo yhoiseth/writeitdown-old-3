@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Entity\Document;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -37,14 +38,32 @@ class DefaultControllerTest extends WebTestCase
         );
 
         $this->assertContains('Documents', $crawler->filter('#container h1')->text());
-
-        $documentRepository = $this->getContainer()->get('doctrine')->getRepository('AppBundle:Document');
     }
 
     public function testLogin()
     {
         $client = $this->makeClient();
         $this->createUserBeforeLoggingIn($client);
+    }
+
+    public function testNew()
+    {
+        $client = $this->makeClient();
+        $this->createUserBeforeLoggingIn($client);
+        $crawler = $client->request('GET', '/new');
+
+        $form = $crawler
+            ->selectButton('Save')
+            ->form();
+
+        $form['appbundle_document[title]'] = 'My new document';
+
+        $client->submit($form);
+
+        $this->assertStatusCode(302, $client);
+        $client->followRedirect();
+        $this->assertThatResponseIsOk($client);
+        $this->assertEquals('/1/edit', $client->getRequest()->getPathInfo());
     }
 
     /**

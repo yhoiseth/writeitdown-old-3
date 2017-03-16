@@ -1,0 +1,11 @@
+{% extends "::base.html.twig" %}
+
+{% block title %}AppBundle:Document:new{% endblock %}
+
+{% block body %}
+<h1>Welcome to the Document:new page</h1>
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <input type="submit" value="Save">
+    {{ form_end(form) }}
+{% endblock %}
