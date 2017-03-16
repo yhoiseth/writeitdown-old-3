@@ -23,7 +23,9 @@ class DefaultControllerTest extends WebTestCase
 
     public function testIndex()
     {
-        $client = static::createClient();
+        $client = $this->makeClient();
+
+        $this->createUserBeforeLoggingIn($client);
 
         $crawler = $client->request('GET', '/');
 
@@ -35,12 +37,45 @@ class DefaultControllerTest extends WebTestCase
         );
 
         $this->assertContains('Documents', $crawler->filter('#container h1')->text());
+
+        $documentRepository = $this->getContainer()->get('doctrine')->getRepository('AppBundle:Document');
     }
 
     public function testLogin()
     {
         $client = $this->makeClient();
+        $this->createUserBeforeLoggingIn($client);
+    }
 
+    /**
+     * @param Client $client
+     */
+    private function assertThatResponseIsOk(Client $client): void
+    {
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    public function getContainer(): ContainerInterface
+    {
+        return $this->container;
+    }
+
+    /**
+     * @param ContainerInterface $container
+     */
+    public function setContainer(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * @param $client
+     */
+    private function createUserBeforeLoggingIn($client): void
+    {
         /** @var Crawler $crawler */
         $crawler = $client->request('GET', '/login');
 
@@ -68,8 +103,7 @@ class DefaultControllerTest extends WebTestCase
             ->form([
                 '_username' => $username,
                 '_password' => $password,
-            ])
-        ;
+            ]);
 
         $client->submit($form);
         $this->assertStatusCode('302', $client);
@@ -83,29 +117,5 @@ class DefaultControllerTest extends WebTestCase
 
         $client->request('GET', '/profile/');
         $this->assertContains('Logged in as marcus', $client->getCrawler()->html());
-    }
-
-    /**
-     * @param Client $client
-     */
-    private function assertThatResponseIsOk(Client $client): void
-    {
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-    }
-
-    /**
-     * @return ContainerInterface
-     */
-    public function getContainer(): ContainerInterface
-    {
-        return $this->container;
-    }
-
-    /**
-     * @param ContainerInterface $container
-     */
-    public function setContainer(ContainerInterface $container)
-    {
-        $this->container = $container;
     }
 }
