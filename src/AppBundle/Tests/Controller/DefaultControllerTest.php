@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Client;
 //use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DomCrawler\Crawler;
 
 class DefaultControllerTest extends WebTestCase
 {
@@ -33,20 +34,50 @@ class DefaultControllerTest extends WebTestCase
 
     public function testLogin()
     {
-        $client = static::createClient();
+        $client = $this->makeClient();
+
+        /** @var Crawler $crawler */
         $crawler = $client->request('GET', '/login');
+
         $this->assertThatResponseIsOk($client);
 
         $container = $this->getContainer();
         $userManager = $container->get('fos_user.user_manager');
 
-        $user = $userManager->createUser();
-        $user->setUsername('marcus');
+        $username = 'marcus';
         $email = 'marcus@aurelius.com';
+        $password = 'equanimity';
+
+        $user = $userManager->createUser();
+
+        $user->setUsername($username);
         $user->setEmail($email);
         $user->setEmailCanonical($email);
-        $user->setPlainPassword('equanimity');
+        $user->setPlainPassword($password);
+        $user->setEnabled(true);
+
         $userManager->updateUser($user);
+
+        $form = $crawler
+            ->selectButton('_submit')
+            ->form([
+                '_username' => $username,
+                '_password' => $password,
+            ])
+        ;
+
+        $client->submit($form);
+        $this->assertStatusCode('302', $client);
+
+        $client->followRedirect();
+        $this->assertThatResponseIsOk($client);
+
+        $path = $client->getRequest()->getPathInfo();
+        $this->assertNotEquals('/login', $path);
+        $this->assertEquals('/', $path);
+
+        $client->request('GET', '/profile/');
+        $this->assertContains('Logged in as marcus', $client->getCrawler()->html());
     }
 
     /**
