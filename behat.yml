@@ -1,0 +1,28 @@
+default:
+    formatters:
+        pretty:
+            verbose: true
+            paths: false
+            snippets: false
+    extensions:
+        Behat\Symfony2Extension: ~
+        Behat\MinkExtension:
+            base_url: 'http://127.0.0.1:8000'
+            goutte: ~
+            default_session: goutte
+            javascript_session: selenium2
+            browser_name: 'chrome'
+            selenium2:
+                capabilities: { "browserName": "chrome", "browser": "chrome", "version":  "52", 'chrome': {'switches':['--no-sandbox']}}
+
+    autoload:
+            - %paths.base%/features/bootstrap
+    suites:
+        app:
+            type: symfony_bundle
+            bundle: AppBundle
+            paths:
+                - %paths.base%/features
+            contexts:
+                - FeatureContext:
+                    entityManager: '@doctrine.orm.default_entity_manager'
