@@ -3,3 +3,6 @@ build:
         php:
             version: 7.1
         selenium: true
+    project_setup:
+        before:
+            - app/console server:start
